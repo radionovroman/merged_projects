@@ -1,0 +1,4 @@
+docker-compose run --rm app django-admin startproject geodjango_rn .
+docker-compose up
+docker exec -it djangorn_container /bin/bash
+docker ps #to see the running containers

@@ -1,0 +1,55 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./docker_geodjango
+    volumes:
+      - ./docker_geodjango:/djangorn
+    ports:
+      - 8000:8000
+    image: app:djangorn
+    container_name: djangorn_container
+    command: gunicorn geodjango_rn.wsgi --bind 0.0.0.0:8000
+    depends_on:
+      - postgres-db
+  postgres-db:
+    image: kartoza/postgis
+    ports:
+      - 5432:5432
+    volumes:
+      - .docker_geodjango/data/postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=romanradionov
+      - POSTGRES_PASS=89250427004
+      - POSTGRES_DBNAME=geodjango_rn
+    container_name: postgres_db
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: 89250427004
+      #PGADMIN_LISTEN_PORT80
+    ports:
+      - "5050:80"
+  frontend:
+    build:
+      context: ./reactleafletgeodjango/my-app
+    volumes:
+      - react_build:/react/build
+  nginx:
+    image: nginx:latest 
+    ports:
+      - 80:8080
+    volumes:
+      - ./nginx/nginx-setup.conf:/etc/nginx/conf.d/default.conf:ro
+      - react_build:/var/www/react
+    depends_on:
+      - app
+      - frontend
+volumes:
+  react_build:
+
+
+
